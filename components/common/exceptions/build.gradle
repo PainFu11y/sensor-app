@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id 'io.freefair.lombok' version "${freefairLombokVersion}"
+}
+
+group = 'org.platform'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //Jackson
+    implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    //OpenApi
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openapiVersion"
+}
+
+test {
+    useJUnitPlatform()
+}

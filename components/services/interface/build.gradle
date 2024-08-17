@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.freefair.lombok' version "${freefairLombokVersion}"
+}
+group = 'org.platform'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":exceptions")
+
+    //OpenApi
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openapiVersion"
+}
+
+test {
+    useJUnitPlatform()
+}
