@@ -78,9 +78,18 @@ public class UserSpringJpa implements UserService {
 
     @Override
     public void updatePassword(UUID userId, UserPassword password) {
-
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        UserEntity userEntity;
+        if(password.getOldPassword() != null && password.getOldPassword().equals(password.getNewPassword())) {
+            throw new UserBadRequestException("Old and new password are the same");
+        }
+        try{
+             userEntity = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+        }catch(UserNotFoundException e){
+            throw new UserNotFoundException("User not found with given ID");
+        }catch(Exception e){
+            throw new UserApiException("Problem while updating password");
+        }
 
         if (userEntity.getPassword() == null) {
             throw new UserBadRequestException("User password is null");
