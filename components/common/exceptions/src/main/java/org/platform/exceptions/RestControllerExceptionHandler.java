@@ -49,6 +49,13 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exceptionResponse);
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public @ResponseBody
+    ResponseEntity<ExceptionResponse> handleForbiddenException(ForbiddenException exception){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), String.valueOf(HttpStatus.FORBIDDEN.value()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<String> details = new ArrayList<>();

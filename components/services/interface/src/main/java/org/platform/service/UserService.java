@@ -22,4 +22,8 @@ public interface UserService {
 
     User updateUser(UUID id, User user);
 
+    boolean updateCredential(String email, String password);
+
+    List<User> search(String name, String surname);
+
 }

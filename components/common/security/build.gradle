@@ -4,8 +4,9 @@ plugins {
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.freefair.lombok' version "${freefairLombokVersion}"
 }
+
 group = 'org.platform'
-version = '1.0'
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -13,19 +14,23 @@ repositories {
 
 dependencies {
     implementation project(":exceptions")
-
+    implementation project (":order-service-interface")
     //OpenApi
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openapiVersion"
+
+    //spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 }
 
 test {
     useJUnitPlatform()
 }
+
 bootJar{
     enabled = false
 }
 
 jar{
     archiveClassifier = ''
-    archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
+    archiveBaseName = 'security'
 }

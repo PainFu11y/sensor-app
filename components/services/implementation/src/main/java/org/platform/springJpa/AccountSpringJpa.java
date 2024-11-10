@@ -32,8 +32,9 @@ public class AccountSpringJpa implements AccountService {
         }catch (Exception e){
             throw new AccountApiException("Problem creating account");
         }
-        if(accountEntity != null){
-            throw new AccountAlreadyExistException("Account already exists with given name");
+        if (accountEntity != null && accountEntity.getAccountType().equals(account.getAccountType())) {
+            throw new AccountAlreadyExistException(
+                    "Account already exists with name " + account.getAccountName() + " and type " + account.getAccountType());
         }
 
         accountEntity = AccountEntity.builder()

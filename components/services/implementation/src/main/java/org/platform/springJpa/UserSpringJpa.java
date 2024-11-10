@@ -1,10 +1,8 @@
 package org.platform.springJpa;
 
 import org.platform.entity.AccountEntity;
-import org.platform.entity.AddressEntity;
 import org.platform.entity.UserEntity;
 import org.platform.exceptions.userexceptions.*;
-import org.platform.model.Address;
 import org.platform.model.User;
 import org.platform.model.UserPassword;
 import org.platform.repository.AccountRepository;
@@ -34,16 +32,18 @@ public class UserSpringJpa implements UserService {
         if (user.isEmpty()) {
             throw new UserNotFoundException("User not found with given ID");
         }
-        return user.get().toUser();
+        return removeHiddenFields(user.get().toUser());
     }
 
 
     @Override
     public User createUser(User user) {
-        UserEntity userEntity = null;
+        UserEntity userEntity;
         Optional<AccountEntity> accountEntity;
         if (user.getUserId() != null) {
             throw new UserBadRequestException("User ID must be null");
+        }if(user.getPassword() != null){
+            throw new UserBadRequestException("Password must be null");
         }
 
         try {
@@ -56,7 +56,7 @@ public class UserSpringJpa implements UserService {
         }
 
         try {
-            accountEntity = accountRepository.findById(user.getAccount_id());
+            accountEntity = accountRepository.findById(user.getAccountId());
         } catch (Exception e) {
             throw new UserApiException("Problem while creating user");
         }
@@ -119,6 +119,7 @@ public class UserSpringJpa implements UserService {
         return userEntities
                 .stream()
                 .map(UserEntity::toUser)
+                .map(this::removeHiddenFields)
                 .toList();
     }
 
@@ -126,7 +127,7 @@ public class UserSpringJpa implements UserService {
     public List<User> getUserByEmail(String email) {
         try {
             UserEntity userEntity = userRepository.getByEmail(email);
-            return List.of(userEntity.toUser());
+            return List.of(removeHiddenFields(userEntity.toUser()));
         } catch (Exception e) {
             throw new UserApiException("Problem during getting users");
         }
@@ -138,7 +139,10 @@ public class UserSpringJpa implements UserService {
         UserEntity existingUser;
         if (user.getUserId() != null && !user.getUserId().equals(userId)) {
             throw new UserBadRequestException("ID of body doesn't match with url parameter");
+        }if(user.getPassword() != null){
+            throw new UserBadRequestException("Password must be null");
         }
+
         try {
             userEntities = userRepository.findById(userId);
             existingUser = userRepository.getByEmailAndUserIdNot(user.getEmail(), userId);
@@ -166,6 +170,32 @@ public class UserSpringJpa implements UserService {
     }
 
     @Override
+    public boolean updateCredential(String email, String password) {
+        UserEntity userEntity;
+        try {
+            userEntity = userRepository.getByEmail(email);
+            if(userEntity == null){
+                throw new UserNotFoundException("User not found with given email");
+            }
+        }catch (Exception e){
+            throw new UserApiException("Problem during updating user");
+        }
+        userEntity.setPassword(passwordEncoder.encode(password));
+        try{
+            userRepository.save(userEntity).toUser();
+        }catch (Exception e){
+            throw new UserApiException("Problem during updating user credentials");
+        }
+        return true;
+    }
+
+    @Override
+    public List<User> search(String name, String surname) {
+        return userRepository.findByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(name,surname)
+                .stream().map(UserEntity::toUser).toList();
+    }
+
+    @Override
     public void deleteUser(UUID userId) {
         userRepository.findById(userId).orElseThrow(() ->
                 new UserNotFoundException("User not found with given ID"));
@@ -188,6 +218,12 @@ public class UserSpringJpa implements UserService {
         }
         return accountEntity.get();
     }
+
+    private User removeHiddenFields(User user){
+        user.setPassword(null);
+        return user;
+    }
+
 }
 
 

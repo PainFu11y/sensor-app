@@ -1,10 +1,7 @@
 package org.platform.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.platform.constants.DatabaseConstants;
 import org.platform.model.User;
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = DatabaseConstants.USER_TABLE, schema = DatabaseConstants.SCHEMA)
 public class UserEntity {
     @Id
@@ -50,7 +48,7 @@ public class UserEntity {
         user.setName(name);
         user.setSurname(surname);
         user.setEmail(email);
-        user.setAccount_id(accountEntity.getAccountId());
+        user.setAccountId(accountEntity.getAccountId());
         user.setAddress(addressEntity.toAddress());
         return user;
     }
@@ -60,6 +58,7 @@ public class UserEntity {
         name = user.getName();
         surname = user.getSurname();
         email = user.getEmail();
+        password = user.getPassword();
         addressEntity =  new AddressEntity(user.getAddress());
     }
 

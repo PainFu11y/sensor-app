@@ -1,13 +1,12 @@
 package org.platform.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.UUID;
 
@@ -15,6 +14,9 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@Jacksonized
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
 
     private static final String NAME_EMPTY_MSG = "Name cannot be empty!";
@@ -43,17 +45,19 @@ public class User {
 
     @NotEmpty(message = EMAIL_EMPTY_MSG)
     @Pattern(regexp = EMAIL_REGEX)
-    @Schema(description = "john@gmail.com", defaultValue = "jon@gmail.com")
+    @Schema(description = "Email of user", defaultValue = "jon@gmail.com")
     private String email;
 
+    @Hidden
+    private String password;
 
-    private UUID account_id;
+    private UUID accountId;
 
     private Address address;
 
     @Hidden
     public UUID getAccountId() {
-        return account_id;
+        return accountId;
     }
 
 }

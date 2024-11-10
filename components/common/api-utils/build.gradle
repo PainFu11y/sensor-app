@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'org.platform'
-version = '1.0-SNAPSHOT'
+version = '1.0'
 
 repositories {
     mavenCentral()
@@ -16,4 +16,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+jar{
+    archiveClassifier = ''
+    archiveBaseName = 'api-utils'
 }

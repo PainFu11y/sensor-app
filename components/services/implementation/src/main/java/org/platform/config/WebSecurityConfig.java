@@ -1,5 +1,6 @@
 package org.platform.config;
 
+import org.platform.ThreadContextInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,10 +11,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -36,10 +39,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
         security.csrf().disable()
                 .authorizeRequests()
-                .requestMatchers("/api/*/*/openapi/**", "/api/v1/accounts/create",
-                        "/api/v1/users/create-user","/auth/token",
-                "/api/v1/accounts", "/api/v1/users/{tempUserId}/password",
-                        "/api/v1/accounts/{id}"
+                .requestMatchers("/api/*/*/openapi/**", "/api/v1/accounts/**","/api/v1/users",
+                        "/api/v1/users/**","/auth/token",
+                "/api/v1/accounts","api/v1/products","/api/v1/users/products"
                         )
                 .permitAll()
                 .anyRequest()
@@ -48,4 +50,8 @@ public class WebSecurityConfig {
         return security.build();
     }
 
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new ThreadContextInterceptor());
+    }
 }

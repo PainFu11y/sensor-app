@@ -7,17 +7,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.platform.NoAuthorizationRequired;
 import org.platform.constants.RoutConstants;
 import org.platform.exceptions.ExceptionResponse;
 import org.platform.model.User;
 import org.platform.model.UserPassword;
 import org.platform.service.UserService;
-import org.platform.springJpa.TempUserSpringJpa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -26,8 +27,6 @@ import java.util.UUID;
 public class UserController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private TempUserSpringJpa tempUserSpringJpa;
 
 
     @Operation(summary = "Get user with given ID.") //
@@ -67,46 +66,42 @@ public class UserController {
             }),
 
     })
-//    @PostMapping("/create-user")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public @ResponseBody User create(@RequestBody @Valid User user) {
-//        log.info("Received request to create user.", user);
-//        User newUser = userService.createUser(user);
-//        log.info("User created Successfully.");
-//
-//        return newUser;
-//    }
     @PostMapping("/create-user")
     @ResponseStatus(HttpStatus.CREATED)
-    public String createUser(@RequestBody @Valid User user) {
+    @NoAuthorizationRequired
+    public @ResponseBody User create(@RequestBody @Valid User user) {
         log.info("Received request to create user.", user);
-        String tempUserId = tempUserSpringJpa.createTempUser(user);
-        return tempUserId;
+        User newUser = userService.createUser(user);
+        log.info("User created Successfully.");
+
+        return newUser;
     }
-    @Operation(summary = "Create the first password for the user.") //
+    @Operation(summary = "Set password.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User created.", content = {
+            @ApiResponse(responseCode = "204", description = "Password created.", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))
             }),
             @ApiResponse(responseCode = "400", description = "Invalid request to sent endpoint.", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))
             }),
-            @ApiResponse(responseCode = "409", description = "User already exists.", content = {
+            @ApiResponse(responseCode = "404", description = "User not found.", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))
             }),
-            @ApiResponse(responseCode = "500", description = "Error occurred while creating user.", content = {
+            @ApiResponse(responseCode = "500", description = "Error occurred while creating password.", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))
             }),
 
     })
-    @PostMapping("/{tempUserId}/password")
-    @ResponseStatus(HttpStatus.CREATED)
-    public User setPassword(@PathVariable String tempUserId,
-                                            @RequestParam @Valid String password) {
-        User createdUser = tempUserSpringJpa.completeUserCreation(tempUserId, password);
-        log.info("User created Successfully.");
-        return createdUser;
+    @NoAuthorizationRequired
+    @PutMapping("/set-password/{email}")
+    public @ResponseBody boolean updateCredential(@PathVariable String email,@RequestBody Map<String, String> password) {
+        log.info("Received request to create password.");
+        boolean password1 = userService.updateCredential(email, password.get("password"));
+        log.info("Password created");
+        return password1;
     }
+
+
 
 
     @Operation(summary = "Update password.")
@@ -211,6 +206,11 @@ public class UserController {
         User updatedUser = userService.updateUser(id,user);
         log.info("User updated Successfully.");
         return updatedUser;
+    }
+
+    @GetMapping("/search")
+    public @ResponseBody List<User> search(@RequestParam String name, @RequestParam String surname) {
+        return userService.search(name,surname);
     }
 
 

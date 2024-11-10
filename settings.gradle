@@ -10,6 +10,9 @@ project(":order-service-interface").projectDir = file("components/services/inter
 //common projects
 include ':api-utils'
 include ':exceptions'
+include ':security'
 project(":api-utils").projectDir = file("components/common/api-utils")
 project(":exceptions").projectDir = file("components/common/exceptions")
+project(":security").projectDir = file("components/common/security")
+
 

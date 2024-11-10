@@ -1,7 +1,7 @@
 package org.platform.controller;
 
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.persistence.Access;
+import org.platform.NoAuthorizationRequired;
 import org.platform.model.LoginRequest;
 import org.platform.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ public class AuthenticationController {
     private TokenService tokenService;
 
     @RequestMapping(value = "/token", method = RequestMethod.POST)
+    @NoAuthorizationRequired
     public @ResponseBody String login (@RequestBody LoginRequest loginRequest){
 
         return tokenService.getToken(loginRequest);

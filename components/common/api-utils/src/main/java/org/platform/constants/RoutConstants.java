@@ -6,4 +6,5 @@ public class RoutConstants {
     public static final String VERSION = "/v1";
     public static final String USERS = "/users";
     public static final String ACCOUNTS = "/accounts";
+    public static final String PRODUCTS = "/products";
 }
