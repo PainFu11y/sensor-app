@@ -1,18 +1,16 @@
-rootProject.name = 'order-help'
+rootProject.name = 'sensor-app'
 
 //services
-include ':order-service-implementation'
-include ':order-service-interface'
-project(":order-service-implementation").projectDir = file("components/services/implementation")
-project(":order-service-interface").projectDir = file("components/services/interface")
+include ':sensor-service-implementation'
+include ':sensor-service-interface'
+project(":sensor-service-implementation").projectDir = file("components/services/implementation")
+project(":sensor-service-interface").projectDir = file("components/services/interface")
 
 
 //common projects
 include ':api-utils'
 include ':exceptions'
-include ':security'
 project(":api-utils").projectDir = file("components/common/api-utils")
 project(":exceptions").projectDir = file("components/common/exceptions")
-project(":security").projectDir = file("components/common/security")
 
 

@@ -2,8 +2,7 @@ package org.platform.config;
 
 import lombok.SneakyThrows;
 import org.platform.entity.UserEntity;
-import org.platform.exceptions.userexceptions.UserApiException;
-import org.platform.exceptions.userexceptions.UserNotFoundException;
+import org.platform.exceptions.ForbiddenException;
 import org.platform.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -24,16 +23,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         UserEntity userEntity = null;
         try {
-            userEntity = userRepository.getByEmail(username);
+            userEntity = userRepository.findByUsername(username);
         } catch (Exception ex) {
-            throw new UserApiException("Problem during authorization process");
+            throw new ForbiddenException("Problem during authorization process");
         }
         if (userEntity == null) {
-            throw new UserNotFoundException("Wrong email or password");
+            throw new ForbiddenException("Wrong username or password");
         }
 
         return User.builder()
-                .username(userEntity.getEmail())
+                .username(userEntity.getUsername())
                 .password(userEntity.getPassword())
                 .authorities(new ArrayList<>())
                 .build();

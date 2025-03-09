@@ -4,16 +4,18 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.platform.security.MD5Encoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class BeanConfig {
 
     @Bean
-    public PasswordEncoder getPasswordEncoder() {return new MD5Encoder();}
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     private SecurityScheme createApiSecuritySchema() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)

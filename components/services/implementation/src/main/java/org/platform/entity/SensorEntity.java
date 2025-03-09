@@ -9,17 +9,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.platform.constants.DatabaseConstants;
+import org.platform.dto.SensorDto;
 
+import java.util.List;
 import java.util.UUID;
 
-@Setter
+@Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = DatabaseConstants.USER_TABLE, schema = DatabaseConstants.SCHEMA)
-public class UserEntity {
-
+@Table(name = DatabaseConstants.SENSOR_TABLE, schema = DatabaseConstants.SCHEMA)
+public class SensorEntity {
     @Id
     @GenericGenerator(name = "generator", strategy = "uuid2")
     @GeneratedValue(generator = "generator")
@@ -28,11 +29,15 @@ public class UserEntity {
     @NotNull
     @Size(min = 1, max = 100)
     @Column(unique = true)
-    private String username;
+    private String name;
 
-    @NotNull
-    private String password;
+    @OneToMany(mappedBy = "sensor", cascade = CascadeType.ALL)
+    private List<MeasurementEntity> measurements;
 
-
-
+    public SensorDto toSensorDto(){
+    SensorDto sensorDto = new SensorDto();
+    sensorDto.setUserId(id);
+    sensorDto.setName(name);
+    return sensorDto;
+    }
 }

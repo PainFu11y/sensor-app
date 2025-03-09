@@ -3,7 +3,7 @@ package org.platform.config;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.platform.entity.UserEntity;
-import org.platform.exceptions.userexceptions.UserBadRequestException;
+import org.platform.exceptions.ForbiddenException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class JwtUtil {
 
-    private final String secret_key = "orederhelpkey";
+    private final String secret_key = "userkey";
 
-    private long accessTokenValidity = 1000;
+    private long accessTokenValidity = 3600 * 1000;
 
     private final JwtParser jwtParser;
 
@@ -26,10 +26,8 @@ public class JwtUtil {
     }
 
     public String createToken(UserEntity userEntity){
-        Claims claims = Jwts.claims().setSubject(userEntity.getEmail());
-        claims.put("firstName",userEntity.getName());
-        claims.put("lastName", userEntity.getSurname());
-        claims.put("accountType",userEntity.getAccountEntity().getAccountType());
+        Claims claims = Jwts.claims().setSubject(userEntity.getUsername());
+        claims.put("firstName",userEntity.getUsername());
 
 
         Date tokenCreateTime = new Date();
@@ -55,9 +53,9 @@ public class JwtUtil {
             }
             return null;
         } catch (ExpiredJwtException ex) {
-            throw new UserBadRequestException("Token expired was overed");
+            throw new ForbiddenException("Token expired was overed");
         } catch (Exception ex) {
-            throw new UserBadRequestException("unauthorized");
+            throw new ForbiddenException("unauthorized");
         }
     }
 
@@ -74,9 +72,10 @@ public class JwtUtil {
         try {
             return claims.getExpiration().after(new Date());
         } catch (Exception e) {
-            throw new UserBadRequestException("Token expired was overed");
+            throw new ForbiddenException("Token expired was overed");
         }
 
     }
 
 }
+

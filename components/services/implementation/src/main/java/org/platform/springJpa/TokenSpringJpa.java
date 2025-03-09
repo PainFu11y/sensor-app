@@ -1,15 +1,13 @@
 package org.platform.springJpa;
 
 import org.platform.config.JwtUtil;
+import org.platform.dto.login.LoginRequest;
 import org.platform.entity.UserEntity;
-import org.platform.exceptions.userexceptions.UserApiException;
-import org.platform.exceptions.userexceptions.UserBadRequestException;
-import org.platform.model.LoginRequest;
+import org.platform.exceptions.AuthException;
 import org.platform.repository.UserRepository;
 import org.platform.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -31,16 +29,21 @@ public class TokenSpringJpa implements TokenService {
             Authentication authenticate = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-            String email = authenticate.getName();
-            UserEntity userEntity = userRepository.getByEmail(email);
+            String name = authenticate.getName();
+            UserEntity userEntity = userRepository.findByUsername(name);
             userEntity.setPassword("");
             token = jwtUtil.createToken(userEntity);
-        } catch (BadCredentialsException e) {
-            throw new UserBadRequestException("Invalid username or password");
-        } catch (Exception e) {
-            throw new UserApiException("problem during getting token");
+        }catch (Exception e){
+            throw new AuthException(e.getMessage());
         }
+//        catch (RuntimeException e) {
+//            throw new AuthException("Invalid  username or password");
+//        } catch (Exception e) {
+//            throw new SensorApiException("problem during getting token");
+//        }
 
         return token;
     }
+
+
 }
